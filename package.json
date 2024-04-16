@@ -1,0 +1,45 @@
+{
+  "name": "zrl-api",
+  "version": "1.0.0",
+  "description": "Zion Reborn Limited, a software company dedicated to making life and business easier.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "nodemon index.js"
+  },
+  "keywords": [
+    "Zion",
+    "Reborn",
+    "Limited",
+    "ZRL",
+    "Zion",
+    "Reborn",
+    "University",
+    "ZRU",
+    "AI",
+    "company",
+    "Software",
+    "Company",
+    "IT",
+    "Company"
+  ],
+  "author": "Oluwafemi Olasegiri",
+  "license": "ISC",
+  "dependencies": {
+    "address-validator": "^0.2.3",
+    "axios": "^1.6.8",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.3",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.0",
+    "phone-number": "^1.0.2",
+    "sequelize": "^6.37.2",
+    "socket.io": "^4.7.5",
+    "stripe": "^14.23.0"
+  }
+}

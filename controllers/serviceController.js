@@ -1,14 +1,7 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const Sequelize = require('sequelize'); // Import Sequelize
 const { sequelize } = require('../models');
 const User = sequelize.models.user;
 const ServiceType = sequelize.models.service;
-const { sendEmail } = require("../utils/email");
-const { sendSMS } = require("../utils/sms");
-const domain = process.env.APP_WEBSITE_URL || "localhost:3000";
-const { generateRandomNumber } = require("../utils/encrypt");
 
 async function getAll(req, res, data) {
   try {
@@ -28,10 +21,9 @@ async function getAll(req, res, data) {
   }
 }
 
-async function getAllByGroupCode(req, res, data) {
+async function getAllInGroupCode(req, res, data) {
   try {
     const service = await ServiceType.findAll( {where: {svGroupCode: data.svGroupCode}});
-    console.log(service);
     if (!service){
       return res.status(401).json({ message: `No Service with ${svGroupCode} was found, try again` });
     }
@@ -46,7 +38,21 @@ async function getAllByGroupCode(req, res, data) {
   }
 }
 
+async function getOne(req, res, data) {
+  try {
+    const service = await ServiceType.findByPk(data.svId);
+    if (!service){
+      return res.status(401).json({ message: 'Service not found' });
+    }
+    return res.status(201).json({ service });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "Service failed on C" });
+  }
+}
+
 module.exports = {
     getAll,
-    getAllByGroupCode
+    getAllInGroupCode,
+    getOne
 };

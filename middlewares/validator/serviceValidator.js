@@ -1,15 +1,25 @@
 async function validateServiceData(input = {}) {
-  const { svCode, svGroupCode, svName, svDesc, svSlug, svPaymentAmount } = input;
+  const { svId, svCode, svGroupCode, svName, svDesc, svSlug, svPaymentAmount } = input;
   const errors = [];
   const data = {};
+  const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
+
+  if (svId) {
+    if (!svId.trim()) {
+      errors.push('svId is required');
+    } else if (svId.length > 10) {
+      errors.push('svId should contain at least 10 characters');
+    } else {
+      data.svId = svId;
+    }
+  }
 
   if (svCode) {
-    const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
     if (!svCode.trim()) {
       errors.push('Service Code cannot be empty or whitespace only');
     } else if (svCode.length < 2) {
-      errors.push('Service Code must be at least 2 characters long');
-    } else if (!sentencePattern.test(svGroupCode)) {
+      errors.push('Service Code should contain at least 2 characters');
+    } else if (!sentencePattern.test(svCode)) {
       errors.push('Service Code should only contain letters, spaces, and common punctuation');
     } else {
       data.svCode = svCode.trim();
@@ -67,13 +77,13 @@ async function validateServiceData(input = {}) {
       data.svSlug = svSlug.trim();
     }
   }
-  
+
   if (svPaymentAmount) {
     svPaymentAmount = svPaymentAmount.trim();
     if (!svPaymentAmount) {
       errors.push('svPaymentAmount is required');
     } else if (svPaymentAmount.length < 10) {
-      errors.push('svPaymentAmount must be at least 10 characters long');
+      errors.push('svPaymentAmount should contain at least 10 characters');
     } else {
       data.svPaymentAmount = svPaymentAmount;
     }
@@ -82,4 +92,4 @@ async function validateServiceData(input = {}) {
   return { data, errors };
 }
 
-module.exports = validateWhatsappData;
+module.exports = validateServiceData;

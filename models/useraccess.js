@@ -55,8 +55,13 @@ const initializeUserAccessModel = (sequelize) => {
       defaultValue: 'Support'
     },
     status: {
-      type: DataTypes.ENUM('Pending', 'Completed', 'Failed'),
+      type: DataTypes.ENUM('Pending', 'Active', 'Failed'),
       defaultValue: 'Pending'
+    },
+    inviteBy: { // e.g userId
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     },
     inviteDate: {
       type: DataTypes.DATE,

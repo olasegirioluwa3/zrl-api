@@ -31,12 +31,16 @@ const whatsappRoutes = require('./routes/whatsappRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
+const serviceAccessRoutes = require('./routes/serviceAccessRoutes');
+const userAccessRoutes = require('./routes/userAccessRoutes');
 
 userRoutes(app, io, sequelize);
 whatsappRoutes(app, io, sequelize);
 applicationRoutes(app, io, sequelize);
 paymentRoutes(app, io, sequelize);
 serviceRoutes(app, io, sequelize);
+serviceAccessRoutes(app, io, sequelize);
+userAccessRoutes(app, io, sequelize);
 
 io.on('connection', (socket) => {
   console.log('A user connected');

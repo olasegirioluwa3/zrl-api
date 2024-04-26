@@ -7,11 +7,11 @@ const { sendEmail } = require("../utils/email");
 
 async function getAll(req, res, data) {
   try {
-    const service = await ServiceType.findAll();
-    if (!service){
-      return res.status(401).json({ message: 'No Service was found, try again' });
+    const serviceaccess = await ServiceAccess.findAll();
+    if (!serviceaccess){
+      return res.status(401).json({ message: 'No Service Access was found, try again' });
     }
-    return res.status(200).json({ status: "success", service });
+    return res.status(200).json({ status: "success", serviceaccess });
   } catch (error) {
     console.error(error.message);
     if (error instanceof Sequelize.UniqueConstraintError) {
@@ -23,18 +23,24 @@ async function getAll(req, res, data) {
   }
 }
 
-async function getAllByGroupCode(req, res, data) {
+async function createServiceAccess(req, res, data) {
   try {
-    const service = await ServiceType.findAll( {where: {svGroupCode: data.svGroupCode}});
-    if (!service){
-      return res.status(401).json({ message: `No Service with ${svGroupCode} was found, try again` });
+    const serviceaccess = await ServiceAccess.findAll();
+    if (!serviceaccess){
+      return res.status(401).json({ message: 'No Service Access was found, try again' });
     }
-    return res.status(200).json({ status: "successf", service });
+    const newServiceAccess = new ServiceAccess(data);
+    if (await newServiceAccess.save(data)) {
+      res.status(201).json({ message: "Registration successful" });
+    } else {
+      res.status(401).json({ message: "Registration failed, try again" });
+    }
   } catch (error) {
     console.error(error.message);
     if (error instanceof Sequelize.UniqueConstraintError) {
       res.status(400).json({ message: "Email already exists" });
     } else {
+      console.log(error);
       res.status(500).json({ message: "Registration failed on C" });
     }
   }
@@ -42,5 +48,5 @@ async function getAllByGroupCode(req, res, data) {
 
 module.exports = {
     getAll,
-    getAllByGroupCode
+    createServiceAccess
 };

@@ -1,52 +1,45 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const Sequelize = require('sequelize'); // Import Sequelize
 const { sequelize } = require('../models');
-const User = sequelize.models.user;
-const Whatsapp = sequelize.models.whatsapp;
-const validateUserData = "../middlewares/validator/index";
 const { sendEmail } = require("../utils/email");
-const { sendSMS } = require("../utils/sms");
 const domain = process.env.APP_WEBSITE_URL || "localhost:3000";
-const { generateRandomNumber, encryptNumber, decryptNumber } = require("../utils/encrypt");
-
+const { generateRandomNumber } = require("../utils/encrypt");
 const generateToken = () => {
   return crypto.randomBytes(20).toString('hex');
 };
+const Payment = sequelize.models.payment;
+const User = sequelize.models.user;
+const PaymentGateway = require("../services/gateways/paymentGateway");
+const PaystackGateway = require("../services/gateways/paystackGateway");
+const StripeGateway = require("../services/gateways/stripeGateway");
 
 // module.exports = () => {
-async function sendWhatsappVerifyToken(req, res, data) {
+async function create(req, res, data) {
   try {
-    // encrypt number
-    const whatsappNumber = data.whatsappNumber;
-    const theEncryptedNumber = generateRandomNumber();
-    data.whatsappNumberToken = theEncryptedNumber;
+    const user = await User.findByPk(data.userId);
+    if (!user) return res.status(404).send({ status: "failed", message: 'User not found!' });
+    data.email = user.email,
+    data.full_name = user.firstName+' '+user.lastName
     
-    const user = await User.findByPk(req.user.id);
-    data.userId = user.id;
-    const newWhatsapp = new Whatsapp(data);
-    if (await newWhatsapp.save(data)){
-      // const sendingStatus = true; //await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
-      const sendingStatus = await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
-      if (sendingStatus){
-        const link = `${domain}/verify-email/${theEncryptedNumber}`;
-        const emailText = `Welcome to the automated whatsapp experience, click on this link to learn how to set things up: ${link}`;
-        await sendEmail([user.email, data.businessEmail], 'Whatsapp Number Added successfully', emailText)
-        return res.status(201).json({ message: 'Registration successful' });
-      } else {
-        return res.status(401).json({ status: "failed", message: 'Token sending failed, please, try again' });
-      }
+    const { amount, currency, gateway } = req.body;
+    let paymentGateway = PaymentGateway;
+    if (gateway === 'Paystack') {
+      paymentGateway = new PaystackGateway();
+    } else if (gateway === 'Stripe') {
+      paymentGateway = new StripeGateway();
     } else {
-      return res.status(401).json({ message: 'Registration failed, try again' });
+      return res.status(400).send({ status: "failed", error: 'Invalid payment gateway' });
     }
+    const callbackUrl = process.env.PAYMENT_CALLBACK_URL || callbackURL;
+    const paymentDetails = await paymentGateway.initiatePayment(amount, currency, data, callbackUrl);
+    // Create a payment
+    data.paymentReference = paymentDetails.data.reference;
+    data.amountPaid = '0';
+    const payment = await Payment.create(data);
+    res.status(201).send({ payment, paymentDetails, status: "success", message: 'Payment recorded successfully!' });
   } catch (error) {
     console.error(error);
-    if (error instanceof Sequelize.UniqueConstraintError) {
-      res.status(400).json({ message: "Whatsapp number already exists" });
-    } else {
-      res.status(500).json({ message: "Registration failed on C" });
-    }
+    res.status(500).json({ message: "Registration failed on C" });
   }
 }
 
@@ -104,7 +97,6 @@ async function getAllWhatsapp(req, res, data) {
 }
 
 module.exports = {
-    registerWhatsapp,
-    sendWhatsappVerifyToken,
-    getAllWhatsapp
+  create,
+  getAllWhatsapp
 };

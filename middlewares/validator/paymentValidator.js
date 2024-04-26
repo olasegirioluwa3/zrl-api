@@ -1,91 +1,81 @@
-async function validateWhatsappData(whatsappNumber = null, whatsappNumberToken = null, businessName = null, businessDesc = null, businessEmail = null, verifyToken = null, graphAPIToken = null, svId = null ) {
+async function validatePaymentData( input ) {
+  const { svId, userId, amount, amountPaid, paymentReference, paymentAuthorizer, gateway, currency } = input;
   const errors = [];
   const data = {};
 
-  if (whatsappNumber) {
-    const sanitizedNumber = whatsappNumber.replace(/\D/g, '');
-  
-    if (sanitizedNumber.length < 10) {
-      errors.push('Phone number seems too short');
+  if (userId) {
+    const sanitizedNumber = userId.replace(/\D/g, '');
+    if (sanitizedNumber.length < 1) {
+      errors.push('userId seems too small');
     } else if (sanitizedNumber.length > 15) {
-      errors.push('Phone number seems too long');
+      errors.push('userId seems too big');
     } else {
-      data.whatsappNumber = sanitizedNumber;
+      data.userId = sanitizedNumber;
     }
   }
 
-  if (svId) {
-    const sanitizedNumber = svId.replace(/\D/g, '');
-  
-    if (sanitizedNumber.length < 0) {
-      errors.push('svId seems too short');
+  if (amount) {
+    const sanitizedNumber = amount.replace(/\D/g, '');
+    if (sanitizedNumber.length < 2) {
+      errors.push('Amount seems too small');
     } else if (sanitizedNumber.length > 15) {
-      errors.push('svId seems too long');
+      errors.push('Amount seems too big');
     } else {
-      data.svId = sanitizedNumber;
+      data.amount = sanitizedNumber;
     }
   }
 
-  if (whatsappNumberToken) {
-    const sanitizedNumber = whatsappNumberToken.replace(/\D/g, '');
-  
-    if (sanitizedNumber.length < 3) {
-      errors.push('Whatsapp token seems too short');
+  if (amountPaid) {
+    const sanitizedNumber = amountPaid.replace(/\D/g, '');
+    if (sanitizedNumber.length < 2) {
+      errors.push('Amount seems too small');
     } else if (sanitizedNumber.length > 15) {
-      errors.push('Phone number seems too long');
+      errors.push('Amount seems too big');
     } else {
-      data.whatsappNumberToken = sanitizedNumber;
+      data.amountPaid = sanitizedNumber;
     }
   }
-  
-  if (businessName) {
+
+  if (paymentReference) {
     const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
-    if (!businessName.trim()) {
-      errors.push('Business Name cannot be empty or whitespace only');
-    } else if (businessName.length < 2) {
-      errors.push('Business Name must be at least 2 characters long');
-    } else if (!sentencePattern.test(businessName)) {
-      errors.push('Business Name should only contain letters, spaces, and common punctuation');
+    if (!paymentReference.trim()) {
+      errors.push('Payment Reference cannot be empty or whitespace only');
+    } else if (paymentReference.length < 2) {
+      errors.push('Payment Reference must be at least 2 characters long');
+    } else if (!sentencePattern.test(paymentReference)) {
+      errors.push('Payment Reference should only contain letters, spaces, and common punctuation');
     } else {
-      data.businessName = businessName.trim();
+      data.paymentReference = paymentReference.trim();
     }
   }
 
-  if (businessDesc) {
+  if (gateway) {
     const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
-    if (!businessDesc.trim()) {
-      errors.push('Business Desc cannot be empty or whitespace only');
-    } else if (businessDesc.length < 2) {
-      errors.push('Business Desc must be at least 2 characters long');
-    } else if (!sentencePattern.test(businessDesc)) {
-      errors.push('Business Desc should only contain letters, spaces, and common punctuation');
+    if (!gateway.trim()) {
+      errors.push('Gateway cannot be empty or whitespace only');
+    } else if (gateway.length < 2) {
+      errors.push('Gateway must be at least 2 characters long');
+    } else if (!sentencePattern.test(gateway)) {
+      errors.push('Gateway should only contain letters, spaces, and common punctuation');
     } else {
-      data.businessDesc = businessDesc.trim();
+      data.gateway = gateway.trim();
     }
   }
 
-  if (businessEmail){
-    if (!businessEmail || !businessEmail.trim()) {
-      errors.push('business email is required');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(businessEmail)) {
-      errors.push('Invalid business email format');
+  if (currency) {
+    const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
+    if (!currency.trim()) {
+      errors.push('Currency cannot be empty or whitespace only');
+    } else if (currency.length < 2) {
+      errors.push('Currency must be at least 2 characters long');
+    } else if (!sentencePattern.test(currency)) {
+      errors.push('Currency should only contain letters, spaces, and common punctuation');
     } else {
-      data.businessEmail = businessEmail;
-    }
-  }
-  
-  if (graphAPIToken) {
-    graphAPIToken = graphAPIToken.trim();
-    if (!graphAPIToken) {
-      errors.push('graphAPIToken is required');
-    } else if (graphAPIToken.length < 10) {
-      errors.push('graphAPIToken must be at least 10 characters long');
-    } else {
-      data.graphAPIToken = graphAPIToken;
+      data.currency = currency.trim();
     }
   }
 
   return { data, errors };
 }
 
-module.exports = validateWhatsappData;
+module.exports = validatePaymentData;

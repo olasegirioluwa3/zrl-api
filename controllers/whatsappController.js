@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const Sequelize = require('sequelize'); // Import Sequelize
 const { sequelize } = require('../models');
 const User = sequelize.models.user;
+const UserAccess = sequelize.models.useraccess;
 const Whatsapp = sequelize.models.whatsapp;
 const validateUserData = "../middlewares/validator/index";
 const { sendEmail } = require("../utils/email");
@@ -27,9 +28,18 @@ async function sendWhatsappVerifyToken(req, res, data) {
     data.userId = user.id;
     const newWhatsapp = new Whatsapp(data);
     if (await newWhatsapp.save(data)){
-      // const sendingStatus = true; //await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
-      const sendingStatus = await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
-      if (sendingStatus){
+      console.log(newWhatsapp.id);
+      const sa_data = {};
+      sa_data.svId = newWhatsapp.svId;
+      sa_data.svProductId = newWhatsapp.id;
+      sa_data.userId = newWhatsapp.userId;
+      sa_data.role = "Admin";
+      sa_data.status = "Active";
+      
+      const newUserAccess = new UserAccess(sa_data);
+      const sendingStatus = true; //await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
+      // const sendingStatus = await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
+      if (await newUserAccess.save(sa_data) && sendingStatus){
         const link = `${domain}/verify-email/${theEncryptedNumber}`;
         const emailText = `Welcome to the automated whatsapp experience, click on this link to learn how to set things up: ${link}`;
         await sendEmail([user.email, data.businessEmail], 'Whatsapp Number Added successfully', emailText)

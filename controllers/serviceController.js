@@ -46,7 +46,6 @@ async function getOne(req, res, data) {
     }
     return res.status(201).json({ service });
   } catch (error) {
-    console.error(error.message);
     res.status(500).json({ message: "Service failed on C" });
   }
 }

@@ -17,4 +17,9 @@ function decryptNumber(encryptedNumber, key) {
     return (encryptedNumber - key + modulus) % modulus;
 }
 
-module.exports = { generateRandomNumber, encryptNumber, decryptNumber };
+// generateToken used in for email verification
+const generateToken = () => {
+  return crypto.randomBytes(20).toString("hex");
+};
+
+module.exports = { generateRandomNumber, encryptNumber, decryptNumber, generateToken };

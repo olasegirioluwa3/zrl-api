@@ -26,12 +26,16 @@ const initializePaymentModel = (sequelize) => {
       primaryKey: true,
       allowNull: false,
     },
-    svId: {
+    saId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    svProductId: { // e.g whatsappId
+    userId: {
       type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    amount: {
+      type: DataTypes.FLOAT,
       allowNull: false
     },
     amountPaid: {
@@ -65,6 +69,10 @@ const initializePaymentModel = (sequelize) => {
         len: [3, 3],  // ISO currency codes are 3 characters long
         isUppercase: true  // ISO currency codes are uppercase
       }
+    },
+    paymentDueDate: {
+      type: DataTypes.DATE,
+      defaultValue: new Date()
     },
     paymentNextDate: {
       type: DataTypes.DATE,

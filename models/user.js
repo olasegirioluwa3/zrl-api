@@ -8,6 +8,15 @@ class User extends Model {
   static associate(models) {
     // define association here
   }
+  static async emailExist(email) {
+    const user = await User.findOne({
+      where: {
+        email: email
+      }
+    });
+    return !!user;
+    // return this.status === 'Blocked';
+  }
 }
 
 const initializeUserModel = (sequelize, DataTypes) => {
@@ -121,11 +130,6 @@ const initializeUserModel = (sequelize, DataTypes) => {
     },
     localGovernment: {
       type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: '',
-    },
-    parentGuardian: {
-      type: DataTypes.TEXT,
       allowNull: true,
       defaultValue: '',
     },

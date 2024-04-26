@@ -9,7 +9,7 @@ const domain = process.env.APP_WEBSITE_URL || "localhost:3000";
 
 async function getAll(req, res, data) {
   try {
-    const useraccess = await UserAccess.findAll();
+    const useraccess = await UserAccess.findAll({where:{userId: req.user.id}});
     if (!useraccess){
       return res.status(401).json({ message: 'No User Access was found, try again' });
     }
@@ -29,7 +29,6 @@ async function invite(req, res, data) {
   try {
     console.log(data);
     const user = await User.emailExist(data.email);
-    console.log(user);
     if (!user){
       // create an account for the email
       data.password = "&AreYouDoingWell1.";
@@ -77,7 +76,21 @@ async function invite(req, res, data) {
   }
 }
 
-async function createUserAccess(req, res, data) {
+async function getAll(req, res, data) {
+  try {
+    const useraccess = await UserAccess.findAll({where:{userId:data.userId}});
+    if (!useraccess){
+      return res.status(401).json({ message: 'No User Access was found, try again' });
+    } else {
+      res.status(201).json({ status: "success", message: "Registration successful", useraccess });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "Get UserAccess failed on C" });
+  }
+}
+
+async function approveUserAccess(req, res, data) {
   try {
     const useraccess = await UserAccess.findAll();
     if (!useraccess){
@@ -103,5 +116,5 @@ async function createUserAccess(req, res, data) {
 module.exports = {
     getAll,
     invite,
-    createUserAccess
+    approveUserAccess
 };

@@ -11,8 +11,6 @@ module.exports = (app, io, sequelize) => {
   // Registration (handled by userController)
   router.post('/invite', authenticateToken, async (req, res) => {
     try {
-      // check if the user is real      
-      console.log(req.user);
       // check if the request is from a verified user
       const { data, errors } = await validateUserAccessData( req.body );
       if (errors.length > 0) {
@@ -27,12 +25,12 @@ module.exports = (app, io, sequelize) => {
   });
 
   // Registration (handled by userController)
-  router.post('/view-all', authenticateToken, async (req, res) => {
+  router.post('/get-all', authenticateToken, async (req, res) => {
     try {
       // check if the request is from a verified user
       const data = {};
       data.userId = req.user.id;
-      await whatsappController.getAllWhatsapp(req, res, data);
+      await userAccessController.getAll(req, res, data);
     } catch (error) {
       console.error(error);
       res.status(500).send({ status: "failed", message: 'Register failed on R', error: error.message });

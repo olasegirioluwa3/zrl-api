@@ -17,13 +17,8 @@ async function getAll(req, res, data) {
     }
     return res.status(200).json({ status: "success", serviceaccess });
   } catch (error) {
-    console.error(error.message);
-    if (error instanceof Sequelize.UniqueConstraintError) {
-      res.status(400).json({ message: "Email already exists" });
-    } else {
-      console.log(error);
-      res.status(500).json({ message: "Registration failed on C" });
-    }
+    console.log(error);
+    res.status(500).json({ message: "Registration failed on C" });
   }
 }
 
@@ -53,8 +48,8 @@ async function createServiceAccess(req, res, data) {
     if (!service) {
       return res.status(400).send({ status: "failed", error: 'Unknown service' });
     }
-    // switch to check if user have access to svProductId
 
+    // switch to check if user have access to svProductId
     const newServiceAccess = new ServiceAccess(data);
     const paymentData = {};
     const serviceaccess = await newServiceAccess.save(data);
@@ -78,12 +73,6 @@ async function createServiceAccess(req, res, data) {
         const capFee = 2000.0;
         const applicableFees = (parseInt(decimalFee, 10) * parseInt(price, 10)) + parseInt(flatFee, 10);
         finalAmount = applicableFees >= capFee ? parseInt(price, 10) + parseInt(capFee, 10) : ((parseInt(price, 10) + parseInt(flatFee, 10)) / (1 - parseInt(decimalFee, 10))) + 0.01;
-        console.log("decimalfee: "+decimalFee);
-        console.log("price: "+price);
-        console.log("flatFee: "+flatFee);
-        console.log("capfee: "+capFee);
-        console.log("applicablefee: "+applicableFees);
-        console.log("finalamount: "+finalAmount);
       } else if (paymentData.gateway === 'Stripe') {
         paymentGateway = new StripeGateway();
       } else {
@@ -112,7 +101,7 @@ async function createServiceAccess(req, res, data) {
 }
 
 module.exports = {
-    getAll,
-    getOne,
-    createServiceAccess
+  getAll,
+  getOne,
+  createServiceAccess
 };

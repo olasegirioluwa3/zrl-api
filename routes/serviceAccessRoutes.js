@@ -28,11 +28,11 @@ module.exports = (app, io, sequelize) => {
     }
   });
 
-  router.post('/create', authenticateToken, async (req, res) => { 
+  router.post('/creates', async (req, res) => { 
     try {
       const { data, errors } = await validateServiceAccessData(req.body);
       if (errors.length > 0) {
-        return res.status(400).json({ errors });
+        return res.status(400).json({ errors });s
       }
       console.log(data);
       await serviceAccessController.createServiceAccess(req, res, data);

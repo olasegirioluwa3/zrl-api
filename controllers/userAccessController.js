@@ -90,31 +90,33 @@ async function getAll(req, res, data) {
   }
 }
 
-async function approveUserAccess(req, res, data) {
+async function approve(req, res, data) {
   try {
-    const useraccess = await UserAccess.findAll();
-    if (!useraccess){
-      return res.status(401).json({ message: 'No User Access was found, try again' });
+    // Check if user has access
+    const userAccess = await UserAccess.findOne({ where: { id: data.id, userId: req.user.id } });
+    if (!userAccess) {
+      return res.status(401).json({ message: 'No User Access was found, please try again' });
     }
-    const newUserAccess = new UserAccess(data);
-    if (await newUserAccess.save(data)) {
-      res.status(201).json({ message: "Registration successful" });
+
+    // Update user access status
+    userAccess.status = 'Active';
+    userAccess.acceptDate = new Date();
+    const savedUserAccess = await userAccess.save();
+
+    if (savedUserAccess) {
+      return res.status(201).json({ message: 'UserAccess Activated successfully', status: 'success' });
     } else {
-      res.status(401).json({ message: "Registration failed, try again" });
+      return res.status(401).json({ message: 'UserAccess Activation failed, please try again' });
     }
   } catch (error) {
-    console.error(error.message);
-    if (error instanceof Sequelize.UniqueConstraintError) {
-      res.status(400).json({ message: "Email already exists" });
-    } else {
-      console.log(error);
-      res.status(500).json({ message: "Registration failed on C" });
-    }
+    console.error(error);
+    return res.status(500).json({ message: 'UserAccess Approve failed on C' });
   }
 }
+
 
 module.exports = {
     getAll,
     invite,
-    approveUserAccess
+    approve
 };

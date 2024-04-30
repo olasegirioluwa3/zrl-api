@@ -45,11 +45,50 @@ class PaystackGateway extends PaymentGateway {
                     'Authorization': `Bearer ${this.secretKey}`
                 }
             });
-            console.log(response.data);
             return response.data;
         } catch (error) {
             // Handle or throw the error as you see fit.
             throw new Error(`Failed to verify Paystack payment: ${error.message}`);
+        }
+    }
+
+    async createPlan(name, interval, amount) {
+        try {
+            const params = JSON.stringify({
+                name,
+                interval,
+                amount
+            });
+
+            const response = await axios.post(`${this.paystackUrl}/plan`, params, {
+                headers: {
+                    Authorization: `Bearer ${this.secretKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            return response.data;
+        } catch (error) {
+            console.error('Error creating plan:', error.response.data);
+            throw new Error('Failed to create plan'); 
+        }
+    }
+
+    async updateSubscriptionAmount(subscriptionId, newAmount) {
+        try {
+            const response = await axios.put(`${this.paystackUrl}/subscription/${subscriptionId}`, {
+                amount: newAmount,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${this.secretKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            return response.data;
+        } catch (error) {
+            console.error('Error updating subscription amount:', error.response.data);
+            throw new Error('Failed to update subscription amount');
         }
     }
 }

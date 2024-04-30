@@ -50,8 +50,30 @@ async function getOne(req, res, data) {
   }
 }
 
+async function createService(req, res, data) {
+  try {
+    // if create service have plancode
+
+    // ...
+    const service = new ServiceType(data);
+    if (await service.save(data)) {
+      return res.status(201).json({ status: "success", service });
+    } else {
+      return res.status(401).json({ status: "failed", message: "service creation failed" });
+    }
+  } catch (error) {
+    console.error(error.message);
+    if (error instanceof Sequelize.UniqueConstraintError) {
+      res.status(400).json({ message: "svCode already exists" });
+    } else {
+      res.status(500).json({ message: "Create failed on C" });
+    }
+  }
+}
+
 module.exports = {
     getAll,
     getAllInGroupCode,
-    getOne
+    getOne,
+    createService
 };

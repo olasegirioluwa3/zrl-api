@@ -46,6 +46,10 @@ const initializePaymentModel = (sequelize) => {
       type: DataTypes.ENUM('Pending', 'Completed', 'Failed'),
       defaultValue: 'Pending'
     },
+    paymentFullfilled: {
+      type: DataTypes.ENUM('No', 'Yes', 'In-progress'),
+      defaultValue: 'No'
+    },
     paymentReference: {
       type: DataTypes.STRING,
       allowNull: true,

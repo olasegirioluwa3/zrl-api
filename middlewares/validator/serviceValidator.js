@@ -79,10 +79,10 @@ async function validateServiceData(input = {}) {
   }
 
   if (svPaymentAmount) {
-    svPaymentAmount = svPaymentAmount.trim();
+    // svPaymentAmount = svPaymentAmount.trim();
     if (!svPaymentAmount) {
       errors.push('svPaymentAmount is required');
-    } else if (svPaymentAmount.length < 10) {
+    } else if (svPaymentAmount.length > 10) {
       errors.push('svPaymentAmount should contain at least 10 characters');
     } else {
       data.svPaymentAmount = svPaymentAmount;

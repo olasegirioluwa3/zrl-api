@@ -30,16 +30,17 @@ const initializeServiceTypeModel = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [3, 5],
-        isUppercase: true  // ISO currency codes are uppercase
-      }
+        len: [2, 15],
+        isLowercase: true  // ISO currency codes are uppercase
+      },
+      unique: true
     },
     svGroupCode: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [5, 5],
-        isUppercase: true  // ISO currency codes are uppercase
+        len: [2, 15],
+        isLowercase: true  // ISO currency codes are uppercase
       }
     },
     svName: {
@@ -59,12 +60,17 @@ const initializeServiceTypeModel = (sequelize, DataTypes) => {
     svPaymentAmount: { // monthly and year
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "10000,100000"
+      defaultValue: "10000"
     },
     svPaymentDefaultCurrency: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'NGN'
+    },
+    svPaymentFrequency: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'MONTHLY'
     },
     svStatus: {
       type: DataTypes.ENUM('Pending', 'Removed', 'Active'),
@@ -78,6 +84,11 @@ const initializeServiceTypeModel = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
       defaultValue: "Ai-autoreply, conversation monitoring"
+    },
+    svPlanCode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "paystackPlanCode,stripePlanCode"
     },
     createdAt: {
       allowNull: false,

@@ -1,8 +1,19 @@
 async function validateUserAccessData(input = {}) {
-  const { email, svId, svProductId, userId, role, inviteBy } = input;
+  const { id, email, svId, svProductId, userId, role, inviteBy } = input;
   const errors = [];
   const data = {};
   const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
+
+  if (id) {
+    if (isNaN(parseInt(id, 10))) {
+      errors.push('ID must be an integer');
+    } else if (id.length > 10) {
+      errors.push('ID should contain at most 10 digits');
+    } else {
+      data.id = parseInt(id, 10);
+    }
+  }
+  
 
   if (email){
     if (!email || !email.trim()) {

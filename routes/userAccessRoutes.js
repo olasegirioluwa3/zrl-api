@@ -37,6 +37,23 @@ module.exports = (app, io, sequelize) => {
     }
   });
 
+  // Approve
+  router.post('/approve', authenticateToken, async (req, res) => {
+    try {
+      // check if the request is from a verified user
+      const { data, errors } = await validateUserAccessData( req.body );
+      if (errors.length > 0) {
+        return res.status(400).json({ errors });
+      }
+      // check if the request is from a verified user
+      data.userId = req.user.id;
+      await userAccessController.approve(req, res, data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ status: "failed", message: 'Register failed on R', error: error.message });
+    }
+  });
+
   router.get('/', (req, res) => {
     res.status(200).send({ status: "success", message: 'Whatsapp API called' });
   });

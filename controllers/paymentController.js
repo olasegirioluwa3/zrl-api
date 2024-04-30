@@ -9,6 +9,8 @@ const generateToken = () => {
 };
 const Payment = sequelize.models.payment;
 const User = sequelize.models.user;
+const ServiceAccess = sequelize.models.serviceaccess;
+const Service = sequelize.model.service;
 const PaymentGateway = require("../services/gateways/paymentGateway");
 const PaystackGateway = require("../services/gateways/paystackGateway");
 const StripeGateway = require("../services/gateways/stripeGateway");
@@ -18,9 +20,14 @@ async function create(req, res, data) {
   try {
     const user = await User.findByPk(data.userId);
     if (!user) return res.status(404).send({ status: "failed", message: 'User not found!' });
+
     data.email = user.email,
     data.full_name = user.firstName+' '+user.lastName
     
+    // get cost info of the service
+    const serviceaccess = await ServiceAccess.findByPk(data.saId);
+
+    console.log(serviceaccess);
     const { amount, currency, gateway } = req.body;
     let paymentGateway = PaymentGateway;
     if (gateway === 'Paystack') {
@@ -38,8 +45,8 @@ async function create(req, res, data) {
     const payment = await Payment.create(data);
     res.status(201).send({ payment, paymentDetails, status: "success", message: 'Payment recorded successfully!' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Registration failed on C" });
+    console.log(error);
+    res.status(500).json({ message: "Create payment failed on C", error });
   }
 }
 
@@ -76,7 +83,7 @@ async function registerWhatsapp(req, res, data) {
   }
 }
 
-async function getAllWhatsapp(req, res, data) {
+async function getAll(req, res, data) {
   try {
     const user = await User.findByPk(data.userId);
     const whatsapp = await Whatsapp.findAll({ userId: user.id });
@@ -96,7 +103,74 @@ async function getAllWhatsapp(req, res, data) {
   }
 }
 
+async function getOne(req, res, data) {
+  try {
+    const payment = await await Payment.findOne({ where: { paymentReference: data.paymentReference } });
+    if (!payment){
+      return res.status(401).json({ message: 'No payment found, Try again' });
+    }
+    return res.status(200).json({ status: "success", payment });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "get one payment failed on C" });
+  }
+}
+
+async function verify(req, res, data) {
+  try {
+    const payment = await Payment.findOne({ where: { paymentReference: data.paymentReference } });
+    if (!payment){
+      return res.status(401).json({ message: 'No payment found, Try again' });
+    }
+    
+    let serviceaccess = await serviceAccessController.findByPk(payment.saId);
+    
+    const gateway = payment.gateway;
+    const paymentReference = payment.paymentReference;
+
+    let paymentGateway;
+    if (gateway === 'Paystack') { 
+      paymentGateway = new PaystackGateway();
+    } else if (gateway === 'Stripe') {
+      paymentGateway = new StripeGateway();
+    } else {
+      return res.status(400).send({ status: "failed", error: 'Invalid payment gateway' });
+    }
+
+    // check paystack for payment status
+    const verificationDetails = await paymentGateway.verifyPayment(paymentReference);
+
+    // checking my payment status
+    if (verificationDetails.data.status === 'success') {
+      payment.paymentStatus = "Completed";
+      payment.amount = verificationDetails.data.amount / 100;
+      serviceaccess.status = "Completed";
+      
+      // check if payment is not already used
+      if (payment.paymentFullfulled !== "Yes") {
+        console.log("not yet ready");
+        payment.paymentFullfulled = "Yes";
+        serviceaccess.paymentNextDate = payment.paymentNextDate;
+        // update serviceAccess
+        // :change the status back to active
+        
+        // :adding the total months to the sa expire.
+        await serviceaccess.save();
+      }
+    } else if (verificationDetails.status === 'failed') {
+      payment.paymentStatus = "Failed";
+    }
+    await payment.save();
+    return res.send({ payment, verificationDetails, status: "success", message: 'Payment status updated successfully!' });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "get one payment failed on C" });
+  }
+}
+
 module.exports = {
   create,
-  getAllWhatsapp
+  getAll,
+  getOne,
+  verify
 };

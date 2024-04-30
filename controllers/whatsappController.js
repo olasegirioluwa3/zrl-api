@@ -16,7 +16,6 @@ const generateToken = () => {
   return crypto.randomBytes(20).toString('hex');
 };
 
-// module.exports = () => {
 async function sendWhatsappVerifyToken(req, res, data) {
   try {
     // encrypt number
@@ -37,8 +36,8 @@ async function sendWhatsappVerifyToken(req, res, data) {
       sa_data.status = "Active";
       
       const newUserAccess = new UserAccess(sa_data);
-      const sendingStatus = true; //await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
-      // const sendingStatus = await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
+      // const sendingStatus = true; //await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
+      const sendingStatus = await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
       if (await newUserAccess.save(sa_data) && sendingStatus){
         const link = `${domain}/verify-email/${theEncryptedNumber}`;
         const emailText = `Welcome to the automated whatsapp experience, click on this link to learn how to set things up: ${link}`;

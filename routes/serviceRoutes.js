@@ -21,6 +21,21 @@ module.exports = (app, io, sequelize) => {
     }
   });
 
+  router.post('/create', async (req, res) => { 
+    try {
+      let input = {};
+      input = req.body;
+      const { data, errors } = await validateServiceData(input);
+      if (errors.length > 0) {
+        return res.status(400).json({ errors });
+      }
+      const services = await serviceController.createService(req, res, data);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ status: "failed", message: 'Failed to fetch services', error });
+    }
+  });
+
   router.post('/:svGroupCode/group/view', async (req, res) => { 
     try {
       const input = req.params;

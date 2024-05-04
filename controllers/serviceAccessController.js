@@ -68,7 +68,7 @@ async function createServiceAccess(req, res, data) {
       if (paymentData.gateway === 'Paystack') {
         paymentGateway = new PaystackGateway();
         const decimalFee = 1.95 / 100.0;
-        const price = parseInt(service.svPaymentAmount, 10);
+        const price = parseInt(service.svFirstPaymentAmount, 10);
         const flatFee = (parseInt(price, 10) * (1.5 / 100)) + 100;
         const capFee = 2000.0;
         const applicableFees = (parseInt(decimalFee, 10) * parseInt(price, 10)) + parseInt(flatFee, 10);
@@ -80,8 +80,8 @@ async function createServiceAccess(req, res, data) {
       }
       paymentData.amount = finalAmount;
       const callbackUrl = process.env.PAYMENT_CALLBACK_URL || callbackURL;
-
       const paymentDetails = await paymentGateway.initiatePayment(paymentData.amount, paymentData.currency, paymentData, callbackUrl);
+
       // Create a payment
       paymentData.amountPaid = '0';
       paymentData.paymentReference = paymentDetails.data.reference;
@@ -90,7 +90,7 @@ async function createServiceAccess(req, res, data) {
         return res.status(400).send({ status: "failed", error: 'Create payment failed' });
       } else {
         return res.status(201).send({ payment, paymentDetails, status: "success", message: 'Registration and Payment recorded successfully!' });
-      } 
+      }
     } else {
       return res.status(401).json({ status: "failed", message: "serviceaccess creation failed, try again" });
     }

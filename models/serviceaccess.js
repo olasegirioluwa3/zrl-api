@@ -50,7 +50,7 @@ const initializeServiceAccessModel = (sequelize) => {
     paymentNextDate: {
       type: DataTypes.DATE,
       defaultValue: new Date()
-    },
+    }, // #3134801011, musa babatunde, 134,000
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

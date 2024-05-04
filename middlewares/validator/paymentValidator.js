@@ -1,7 +1,18 @@
 async function validatePaymentData( input ) {
-  const { svId, userId, amount, amountPaid, paymentReference, paymentAuthorizer, gateway, currency } = input;
+  const { saId, userId, amount, amountPaid, paymentReference, paymentAuthorizer, gateway, currency, quantity } = input;
   const errors = [];
   const data = {};
+
+  if (saId) {
+    const sanitizedNumber = parseInt(saId, 10);
+    if (sanitizedNumber.length < 1) {
+      errors.push('saId seems too small');
+    } else if (sanitizedNumber.length > 15) {
+      errors.push('saId seems too big');
+    } else {
+      data.saId = sanitizedNumber;
+    }
+  }
 
   if (userId) {
     const sanitizedNumber = userId.replace(/\D/g, '');
@@ -72,6 +83,17 @@ async function validatePaymentData( input ) {
       errors.push('Currency should only contain letters, spaces, and common punctuation');
     } else {
       data.currency = currency.trim();
+    }
+  }
+
+  if (quantity) {
+    const sanitizedNumber = parseInt(quantity, 10);
+    if (sanitizedNumber.length < 1) {
+      errors.push('quantity seems too small');
+    } else if (sanitizedNumber.length > 15) {
+      errors.push('quantity seems too big');
+    } else {
+      data.quantity = sanitizedNumber;
     }
   }
 

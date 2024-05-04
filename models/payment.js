@@ -36,11 +36,13 @@ const initializePaymentModel = (sequelize) => {
     },
     amount: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
     },
     amountPaid: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
     },
     paymentStatus: {
       type: DataTypes.ENUM('Pending', 'Completed', 'Failed'),
@@ -81,6 +83,11 @@ const initializePaymentModel = (sequelize) => {
     paymentNextDate: {
       type: DataTypes.DATE,
       defaultValue: new Date()
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     },
     createdAt: {
       allowNull: false,

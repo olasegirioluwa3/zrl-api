@@ -1,6 +1,6 @@
 const express = require('express');
-const { createServiceAccess } = require('../controllers/serviceAccessController');
 const router = express.Router();
+const authenticateToken = require('../middlewares/auth.user.middleware');
 
 module.exports = (app, io, sequelize) => {
   const paymentController = require('../controllers/paymentController');
@@ -8,7 +8,7 @@ module.exports = (app, io, sequelize) => {
   const validatePaymentData = require("../middlewares/validator/paymentValidator");
 
 
-  router.post('/create', async (req, res) => {
+  router.post('/create', authenticateToken, async (req, res) => {
     try {
       const { data, errors } = await validatePaymentData(req.body);
       if (errors.length > 0) {

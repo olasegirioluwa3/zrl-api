@@ -57,6 +57,11 @@ const initializeServiceTypeModel = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    svFirstPaymentAmount: { // monthly and year
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "3000"
+    },
     svPaymentAmount: { // monthly and year
       type: DataTypes.STRING,
       allowNull: false,

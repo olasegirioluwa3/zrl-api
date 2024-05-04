@@ -32,7 +32,7 @@ class PaystackGateway extends PaymentGateway {
             return response.data;
         } catch (error) {
             // console.error('Paystack Error Response:', error.response?.data);
-            throw new Error(`Failed to initialize Paystack payment: ${error.message}`);
+            throw new Error(`Failed to initialize Paystack payment: ${error}`);
         }
     }
 

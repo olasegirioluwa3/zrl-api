@@ -62,7 +62,11 @@ async function sendWhatsappVerifyToken(req, res, data) {
 async function registerWhatsapp(req, res, data) {
   try {
     const user = await User.findByPk(req.user.id);
-    const whatsapp = await Whatsapp.findOne({ whatsappNumber: data.whatsappNumber, whatsappNumberToken: data.whatsappNumberToken, userId: user.id });
+    if (!user) {
+      return res.status(400).send({ status: "failed", error: 'Unknown user' });
+    }
+
+    const whatsapp = await Whatsapp.findOne({ where: { whatsappNumber: data.whatsappNumber, whatsappNumberToken: data.whatsappNumberToken, userId: user.id }});
     
     if (!whatsapp){
       return res.status(401).json({ message: 'Whatsapp registration failed, Invalid Token, try again' });
@@ -73,7 +77,7 @@ async function registerWhatsapp(req, res, data) {
     whatsapp.businessEmail = data.businessEmail;
     whatsapp.userId = user.id;
     whatsapp.status = "Accepted";
-    console.log(data);
+    console.log(whatsapp);
     if (await whatsapp.save()){
       const link = `${domain}/whatsapp/learn-more`;
       const emailText = `Welcome to the automated whatsapp experience, click on this link to learn how to set things up: ${link}`;

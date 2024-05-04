@@ -17,6 +17,20 @@ module.exports = (app, io, sequelize) => {
     }
   });
 
+  router.post('/create', authenticateToken, async (req, res) => { 
+    try {
+      const { data, errors } = await validateServiceAccessData(req.body);
+      if (errors.length > 0) {
+        return res.status(400).json({ errors });s
+      }
+      console.log(data);
+      const serviceaccess = await serviceAccessController.createServiceAccess(req, res, data);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ status: "failed", message: 'Failed to create service access on R', error });
+    }
+  });
+  
   router.post('/:id', authenticateToken, async (req, res) => { 
     try {
       let data = {};
@@ -28,19 +42,5 @@ module.exports = (app, io, sequelize) => {
     }
   });
 
-  router.post('/creates', async (req, res) => { 
-    try {
-      const { data, errors } = await validateServiceAccessData(req.body);
-      if (errors.length > 0) {
-        return res.status(400).json({ errors });s
-      }
-      console.log(data);
-      await serviceAccessController.createServiceAccess(req, res, data);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send({ status: "failed", message: 'Failed to create service access on R', error });
-    }
-  });
-  
   app.use('/api/serviceaccess', router);
 }

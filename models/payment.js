@@ -42,7 +42,7 @@ const initializePaymentModel = (sequelize) => {
     amountPaid: {
       type: DataTypes.FLOAT,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 0,
     },
     paymentStatus: {
       type: DataTypes.ENUM('Pending', 'Completed', 'Failed'),

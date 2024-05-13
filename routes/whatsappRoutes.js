@@ -56,6 +56,38 @@ module.exports = (app, io, sequelize) => {
     }
   });
 
+  router.post('/:id/webhook', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const input = {};
+      input.id = id;
+      const { data, errors } = await validateWhatsappData( input );
+      if (errors.length > 0) {
+        return res.status(400).json({ errors });
+      }
+      await whatsappController.incomingMessage(req, res, data, openai);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ status: "failed", message: 'Verify failed on R', error: error.message });
+    }
+  });
+
+  router.get('/:id/webhook', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const input = {};
+      input.id = id;
+      const { data, errors } = await validateWhatsappData( input );
+      if (errors.length > 0) {
+        return res.status(400).json({ errors });
+      }
+      await whatsappController.verifyWhatsapp(req, res, data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ status: "failed", message: 'Verify failed on R', error: error.message });
+    }
+  });
+
   router.get('/', (req, res) => {
     res.status(200).send({ status: "success", message: 'Whatsapp API called' });
   });

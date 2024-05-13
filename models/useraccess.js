@@ -38,13 +38,10 @@ const initializeUserAccessModel = (sequelize) => {
       primaryKey: true,
       allowNull: false,
     },
-    svId: {
+    saId: {
       type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    svProductId: { // e.g whatsappId
-      type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
     },
     userId: { // e.g whatsappId
       type: DataTypes.INTEGER,

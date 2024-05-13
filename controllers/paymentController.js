@@ -41,21 +41,18 @@ async function create(req, res, data) {
       paymentData.currency = data.currency || service.svPaymentCurrency;
       
       // Calculate price and paymentNextDate
-      let quantity = parseInt(data.quantity, 10);
-      let price = parseInt(service.svPaymentAmount, 10);;
-      let paymentNextDate = new Date();
-      if (!quantity || isNaN(quantity) || quantity < 2) {
-        console.log(serviceaccess.paymentNextMonth)
-        paymentNextDate.setMonth(paymentNextDate.getMonth() + 1);
-      } else {
-        paymentNextDate.setMonth(paymentNextDate.getMonth() + (1 * quantity));
-        price = parseInt(service.svPaymentAmount, 10) * quantity;
-      }
+      let quantity = parseInt(data.quantity, 10) || 1;
+      paymentData.quantity = quantity;
+      let price = parseInt(service.svPaymentAmount, 10);
+      let paymentNextDate = new Date(serviceaccess.paymentNextDate);
+      paymentNextDate.setMonth(paymentNextDate.getMonth() + quantity);
+      price = parseInt(service.svPaymentAmount, 10) * quantity;
 
       let paymentGateway = PaymentGateway;
       let finalAmount;
+
       if (paymentData.gateway === 'Paystack') {
-        paymentGateway = new PaystackGateway();
+        paymentGateway = new PaystackGateway();         
         const decimalFee = 1.95 / 100.0;
         const flatFee = (parseInt(price, 10) * (1.5 / 100)) + 100;
         const capFee = 2000.0;
@@ -69,7 +66,7 @@ async function create(req, res, data) {
       paymentData.amount = finalAmount;
       const callbackUrl = process.env.PAYMENT_CALLBACK_URL || callbackURL;
       const paymentDetails = await paymentGateway.initiatePayment(paymentData.amount, paymentData.currency, paymentData, callbackUrl);
-
+      if (!paymentDetails) return res.status(400).send({ status: "failed", error: 'Try another quantity' });
       // Create a payment
       paymentData.amountPaid = '0';
       paymentData.paymentReference = paymentDetails.data.reference;
@@ -131,6 +128,9 @@ async function verify(req, res, data) {
     }
     
     let serviceaccess = await ServiceAccess.findByPk(payment.saId);
+    if (!serviceaccess){
+      return res.status(401).json({ message: 'No service access found, Try again' });
+    }
     
     const gateway = payment.gateway;
     const paymentReference = payment.paymentReference;

@@ -8,8 +8,8 @@
     "dialect": "mysql"
   },
   "test": {
-    "use_env_variable": "DATABASE_URL_TEST",
-    "dialect": "mysql"
+    "dialect": "sqlite",
+    "storage": "./data/test-database.sqlite"
   },
   "production": {
     "use_env_variable": "DATABASE_URL_PROD",

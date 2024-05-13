@@ -1,10 +1,21 @@
-async function validateWhatsappData(whatsappNumber = null, whatsappNumberToken = null, businessName = null, businessDesc = null, businessEmail = null, verifyToken = null, graphAPIToken = null, svId = null ) {
+async function validateWhatsappData( input ) {
+  const { whatsappNumber, whatsappNumberToken, businessName, businessDesc, businessEmail, verifyToken, graphAPIToken, svId } = input;
   const errors = [];
   const data = {};
 
+  if (id) {
+    const sanitizedNumber = id.replace(/\D/g, '');
+    if (sanitizedNumber.length < 0) {
+      errors.push('id seems too short');
+    } else if (sanitizedNumber.length > 15) {
+      errors.push('id seems too long');
+    } else {
+      data.id = sanitizedNumber;
+    }
+  }
+
   if (whatsappNumber) {
     const sanitizedNumber = whatsappNumber.replace(/\D/g, '');
-  
     if (sanitizedNumber.length < 10) {
       errors.push('Phone number seems too short');
     } else if (sanitizedNumber.length > 15) {

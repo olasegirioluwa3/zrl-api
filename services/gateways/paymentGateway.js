@@ -1,5 +1,5 @@
 class PaymentGateway {
-    initiatePayment(amount, currency, callbackUrl) {
+    initiatePayment(amount, currency, data, callbackUrl) {
         throw new Error("Method not implemented.");
     }
 

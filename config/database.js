@@ -22,22 +22,19 @@ switch (ENV) {
         };
         break;
     
-    case 'test':
-          sequelizeConfig = {
-            database: process.env.DATABASENAME,
-            username: process.env.DATABASEUSER,
-            password: process.env.DATABASEPASSWORD,
-            host: process.env.DATABASEHOST || 'localhost',
-            dialect: 'mysql',
-            pool: {
-                max: 5,
-                min: 0,
-                acquire: 30000,
-                idle: 10000
-            },
-            logging: console.log
-        };
-        break;
+        case 'test':
+            sequelizeConfig = {
+                dialect: 'sqlite',
+                storage: './data/test-database.sqlite',
+                pool: {
+                    max: 5,
+                    min: 0,
+                    acquire: 30000,
+                    idle: 10000
+                },
+                logging: console.log
+            };
+            break;
     
     case 'production':
           sequelizeConfig = {

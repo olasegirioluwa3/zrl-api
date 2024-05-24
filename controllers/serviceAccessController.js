@@ -59,16 +59,30 @@ async function createServiceAccess(req, res, data) {
       paymentData.email = user.email;
       paymentData.full_name = user.firstName+' '+user.lastName
       paymentData.saId = serviceaccess.id;
+
       // get cost info of the service
       paymentData.gateway = data.gateway || service.svPaymentGateway;
       paymentData.currency = data.currency || service.svPaymentCurrency;
       
+      // Calculate price and paymentNextDate
+      let quantity = parseInt(data.quantity, 10) || 1;
+      quantity = Math.max(quantity, 1);
+      paymentData.quantity = quantity;
+      let price;
+      let paymentNextDate = new Date();
+      paymentNextDate.setMonth(paymentNextDate.getMonth() + quantity);
+      if (quantity>1){
+        price = (parseInt(service.svFirstPaymentAmount, 10)) + (parseInt(service.svPaymentAmount, 10) * (quantity-1));
+      } else {
+        price = parseInt(service.svFirstPaymentAmount, 10);
+      }
+      
       let paymentGateway = PaymentGateway;
       let finalAmount;
+
       if (paymentData.gateway === 'Paystack') {
         paymentGateway = new PaystackGateway();
         const decimalFee = 1.95 / 100.0;
-        const price = parseInt(service.svFirstPaymentAmount, 10);
         const flatFee = (parseInt(price, 10) * (1.5 / 100)) + 100;
         const capFee = 2000.0;
         const applicableFees = (parseInt(decimalFee, 10) * parseInt(price, 10)) + parseInt(flatFee, 10);
@@ -81,10 +95,13 @@ async function createServiceAccess(req, res, data) {
       paymentData.amount = finalAmount;
       const callbackUrl = process.env.PAYMENT_CALLBACK_URL || callbackURL;
       const paymentDetails = await paymentGateway.initiatePayment(paymentData.amount, paymentData.currency, paymentData, callbackUrl);
-
+      if (!paymentDetails){
+        return res.status(400).send({ status: "failed", error: 'Initiating payment failed' });
+      }
       // Create a payment
       paymentData.amountPaid = '0';
       paymentData.paymentReference = paymentDetails.data.reference;
+      paymentData.paymentNextDate = paymentNextDate;
       const payment = await Payment.create(paymentData);
       if (!payment){
         return res.status(400).send({ status: "failed", error: 'Create payment failed' });

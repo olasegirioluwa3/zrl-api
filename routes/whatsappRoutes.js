@@ -11,11 +11,8 @@ module.exports = (app, io, sequelize) => {
   // Registration (handled by userController)
   router.post('/create-init', authenticateToken, async (req, res) => {
     try {
-      // check if the user is real      
-      console.log(req.user);
-      // check if the request is from a verified user
-      const { whatsappNumber, svId } = req.body;
-      const { data, errors } = await validateWhatsappData( whatsappNumber, null, null, null, null, null, null, svId );
+      console.log("/api/whatsapp/create-init");
+      const { data, errors } = await validateWhatsappData( req.body );
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }
@@ -29,9 +26,8 @@ module.exports = (app, io, sequelize) => {
   // Registration (handled by userController)
   router.post('/create', authenticateToken, async (req, res) => {
     try {
-      // check if the request is from a verified user
-      const { whatsappNumber, whatsappNumberToken, businessName, businessDesc, businessEmail } = req.body;
-      const { data, errors } = await validateWhatsappData( whatsappNumber, whatsappNumberToken, businessName, businessDesc, businessEmail );
+      console.log("/api/whatsapp/create");
+      const { data, errors } = await validateWhatsappData( req.body );
       data.userId = req.user.id;
       if (errors.length > 0) {
         return res.status(400).json({ errors });
@@ -46,7 +42,7 @@ module.exports = (app, io, sequelize) => {
   // Registration (handled by userController)
   router.post('/view-all', authenticateToken, async (req, res) => {
     try {
-      // check if the request is from a verified user
+      console.log("/api/whatsapp/view-all");
       const data = {};
       data.userId = req.user.id;
       await whatsappController.getAllWhatsapp(req, res, data);
@@ -56,27 +52,27 @@ module.exports = (app, io, sequelize) => {
     }
   });
 
-  router.post('/:id/webhook', async (req, res) => {
+  router.post('/:saId/webhook', async (req, res) => {
     try {
-      const { id } = req.params;
+      const { saId } = req.params; 
       const input = {};
-      input.id = id;
+      input.saId = saId;
       const { data, errors } = await validateWhatsappData( input );
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }
-      await whatsappController.incomingMessage(req, res, data, openai);
+      await whatsappController.incomingMessage(req, res, data);
     } catch (error) {
       console.error(error);
       res.status(500).send({ status: "failed", message: 'Verify failed on R', error: error.message });
     }
   });
 
-  router.get('/:id/webhook', async (req, res) => {
+  router.get('/:saId/webhook', async (req, res) => {
     try {
-      const { id } = req.params;
+      const { saId } = req.params; 
       const input = {};
-      input.id = id;
+      input.saId = saId;
       const { data, errors } = await validateWhatsappData( input );
       if (errors.length > 0) {
         return res.status(400).json({ errors });

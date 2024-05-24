@@ -11,8 +11,9 @@ module.exports = (app, io, sequelize) => {
   // Registration (handled by userController)
   router.post('/register', async (req, res) => {
     try {
-      const { email, password, phoneNumber, firstName, middleName, lastName, username } = req.body;
-      const { data, errors } = await validateUserData(email, password, phoneNumber, firstName, middleName, lastName, username);
+      console.log("api/users/register");
+      const { data, errors } = await validateUserData( req.body );
+      console.log("starting");
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }
@@ -25,8 +26,8 @@ module.exports = (app, io, sequelize) => {
 
   router.post('/login', async (req, res) => {
     try {
-      const { email, password } = req.body;
-      const { data, errors } = await validateUserData(email, password);
+      console.log("api/users/login");
+      const { data, errors } = await validateUserData( req.body );
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }
@@ -84,8 +85,8 @@ module.exports = (app, io, sequelize) => {
   
   router.post('/forgot-password', async (req, res) => {
     try {
-      const { email } = req.body;
-      const { data, errors } = await validateUserData(email);
+      console.log("api/users/forgot-password");
+      const { data, errors } = await validateUserData( req.body );
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }
@@ -98,8 +99,8 @@ module.exports = (app, io, sequelize) => {
 
   router.post('/verify-account-email/:emailVerificationToken', async (req, res, data) => {
     try {
-      const { emailVerificationToken } = req.params;
-      const { data, errors } = await validateUserData(null, null, null, null, null, null, null, null, emailVerificationToken);
+      console.log("api/users/verify-account-email/:emailVerificationToken");
+      const { data, errors } = await validateUserData( req.params );
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }
@@ -112,8 +113,8 @@ module.exports = (app, io, sequelize) => {
 
   router.post('/forgot-password-init/:resetPasswordToken', async (req, res) => {
     try {
-      const { resetPasswordToken } = req.params;
-      const { data, errors } = await validateUserData(null, null, null, null, null, null, null, null, null, resetPasswordToken);
+      console.log("api/users/forgot-password-init/:resetPasswordToken");
+      const { data, errors } = await validateUserData( req.params );
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }
@@ -126,8 +127,8 @@ module.exports = (app, io, sequelize) => {
 
   router.post('/forgot-password-final', async (req, res) => {
     try {
-      const { resetPasswordToken, password } = req.body;
-      const { data, errors } = await validateUserData(null, password, null, null, null, null, null, null, null, resetPasswordToken);
+      console.log("api/users/forgot-password-final");
+      const { data, errors } = await validateUserData( req.body );
       if (errors.length > 0) {
         return res.status(400).json({ errors });
       }

@@ -18,7 +18,7 @@ const initializeMessageModel = (sequelize) => {
       allowNull: false,
       defaultValue: 0
     },
-    senderId: {
+    senderId: { // either contact or user
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0

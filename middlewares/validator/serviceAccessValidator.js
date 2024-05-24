@@ -1,5 +1,5 @@
 async function validateServiceAccessData(input = {}) {
-  const { svId, svProductId, amountPaid, paymentReference, paymentAuthorizer, gateway, currency } = input;
+  const { svId, svProductId, amountPaid, paymentReference, paymentAuthorizer, gateway, currency, quantity } = input;
   const errors = [];
   const data = {};
   const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
@@ -79,6 +79,16 @@ async function validateServiceAccessData(input = {}) {
       errors.push('Currency should only contain letters, spaces, and common punctuation');
     } else {
       data.currency = currency.trim();
+    }
+  }
+
+  if (quantity) {
+    if (!quantity.trim()) {
+      errors.push('quantity is required');
+    } else if (quantity.length > 10) {
+      errors.push('quantity should contain at least 10 characters');
+    } else {
+      data.quantity = quantity;
     }
   }
 

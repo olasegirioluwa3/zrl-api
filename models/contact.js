@@ -47,6 +47,11 @@ const initializeContactModel = (sequelize) => {
       allowNull: false,
       defaultValue: ''
     },
+    contactPhoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: ''
+    },
     contactStatus: {
       type: DataTypes.ENUM('Active', 'Inactive', 'Compromised'),
       defaultValue: 'Active'

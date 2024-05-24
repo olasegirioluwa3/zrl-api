@@ -1,4 +1,5 @@
-async function validateUserData(email = null, password = null, phoneNumber= null, firstName = null, middleName = null, lastName = null, username = null, gender = null, emailVerificationToken = null, resetPasswordToken = null) {
+async function validateUserData( input ) {
+  const { email, password, phoneNumber, firstName, middleName, lastName, username, gender, emailVerificationToken, resetPasswordToken } = input;
   const errors = [];
   const data = {};
 
@@ -106,7 +107,7 @@ async function validateUserData(email = null, password = null, phoneNumber= null
   }
 
   if (emailVerificationToken) {
-    emailVerificationToken = emailVerificationToken.trim();
+    // emailVerificationToken = emailVerificationToken.trim();
     if (!emailVerificationToken) {
       errors.push('emailVerificationToken is required');
     } else if (emailVerificationToken.length < 10) {
@@ -117,7 +118,6 @@ async function validateUserData(email = null, password = null, phoneNumber= null
   }
 
   if (resetPasswordToken) {
-    resetPasswordToken = resetPasswordToken.trim();
     if (!resetPasswordToken) {
       errors.push('resetPasswordToken is required');
     } else if (resetPasswordToken.length < 10) {

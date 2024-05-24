@@ -79,6 +79,7 @@ fs.readdirSync(__dirname)
 //     console.error("Error dropping and re-syncing tables:", err);
 //   });
 
+
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

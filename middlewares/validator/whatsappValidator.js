@@ -1,5 +1,5 @@
 async function validateWhatsappData( input ) {
-  const { whatsappNumber, whatsappNumberToken, businessName, businessDesc, businessEmail, verifyToken, graphAPIToken, svId } = input;
+  const { id, whatsappNumber, whatsappNumberToken, businessName, businessDesc, businessEmail, verifyToken, graphAPIToken, svId, saId } = input;
   const errors = [];
   const data = {};
 
@@ -34,6 +34,18 @@ async function validateWhatsappData( input ) {
       errors.push('svId seems too long');
     } else {
       data.svId = sanitizedNumber;
+    }
+  }
+
+  if (saId) {
+    const sanitizedNumber = saId.replace(/\D/g, '');
+  
+    if (sanitizedNumber.length < 0) {
+      errors.push('saId seems too short');
+    } else if (sanitizedNumber.length > 15) {
+      errors.push('saId seems too long');
+    } else {
+      data.saId = sanitizedNumber;
     }
   }
 

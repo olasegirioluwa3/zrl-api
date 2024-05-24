@@ -5,8 +5,11 @@ const crypto = require('crypto');
 const Sequelize = require('sequelize'); // Import Sequelize
 const { sequelize } = require('../models');
 const User = sequelize.models.user;
+const ServiceAccess = sequelize.models.serviceaccess;
 const UserAccess = sequelize.models.useraccess;
 const Whatsapp = sequelize.models.whatsapp;
+const Contact = sequelize.models.contact;
+const Message = sequelize.models.message;
 
 const validateUserData = "../middlewares/validator/index";
 const { sendEmail } = require("../utils/email");
@@ -69,15 +72,16 @@ async function sendWhatsappVerifyToken(req, res, data) {
 
 async function registerWhatsapp(req, res, data) {
   try {
-    const user = await User.findByPk(req.user.id);
+    console.log("in find user");
+    const user = await User.findByPk( req.user.id );
     if (!user) {
       return res.status(400).send({ status: "failed", error: 'Unknown user' });
     }
 
+    console.log("in find whatsapp");
     const whatsapp = await Whatsapp.findOne({ where: { whatsappNumber: data.whatsappNumber, whatsappNumberToken: data.whatsappNumberToken, userId: user.id }});
-    
     if (!whatsapp){
-      return res.status(401).json({ message: 'Whatsapp registration failed, Invalid Token, try again' });
+      return res.status(401).json({ message: 'Whatsapp registration failed, Token cannot be linked to the Whatsapp Number. Please, try again' });
     }
 
     whatsapp.businessName = data.businessName;
@@ -85,7 +89,7 @@ async function registerWhatsapp(req, res, data) {
     whatsapp.businessEmail = data.businessEmail;
     whatsapp.userId = user.id;
     whatsapp.status = "Accepted";
-    console.log(whatsapp);
+    
     if (await whatsapp.save()){
       const link = `${domain}/whatsapp/learn-more`;
       const emailText = `Welcome to the automated whatsapp experience, click on this link to learn how to set things up: ${link}`;
@@ -126,11 +130,16 @@ async function getAllWhatsapp(req, res, data) {
 
 async function verifyWhatsapp(req, res, data) {
   try {
-    const whatsapp = await Whatsapp.findByPk( data.id );
-    if (!whatsapp){
-      return res.status(401).json({ message: 'Whatsapp not found, try again' });
-    }
-    
+    // check if saId is valid
+    const serviceaccess = await ServiceAccess.findByPk(data.saId);
+    if (!serviceaccess)  return res.status(400).send({ status: "failed", error: 'Unknown serviceaccess' });
+    // check if service is valid
+    const service = await ServiceType.findByPk(serviceaccess.svId);
+    if (!service)  return res.status(400).send({ status: "failed", error: 'Unknown service' });
+    // check if whatsapp is valid
+    const whatsapp = await Whatsapp.findByPk(serviceaccess.svProductId);
+    if (!whatsapp)  return res.status(400).send({ status: "failed", error: 'Whatsapp not found, try again' });
+
     const {
       "hub.mode": mode,
       "hub.verify_token": token,
@@ -152,7 +161,66 @@ async function verifyWhatsapp(req, res, data) {
 }
 
 async function incomingMessage(req, res, data) {
-  const input = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0].text.body;
+  // check if saId is valid
+  const serviceaccess = await ServiceAccess.findByPk(data.saId);
+  if (!serviceaccess)  return res.status(400).send({ status: "failed", error: 'Unknown serviceaccess' });
+  
+  // check if service is valid
+  const service = await ServiceType.findByPk(serviceaccess.svId);
+  if (!service)  return res.status(400).send({ status: "failed", error: 'Unknown service' });
+  
+  // check if whatsapp is valid
+  const whatsapp = await Whatsapp.findByPk(serviceaccess.svProductId);
+  if (!whatsapp)  return res.status(400).send({ status: "failed", error: 'Whatsapp not found, try again' });
+
+  const msgContact = req.body.entry?.[0]?.changes[0]?.value?.contact[0];
+  
+  // check if contact already exist else create contact for that serviceaccess
+  let contact = await Contact.findByPk(msgContact);
+  if (!contact) {
+    const contactData = {}
+    contactData.platformUserId = '';
+    contactData.platformUserGeneralId = '';
+    contactData.platformName = 'Whatsapp'
+    contactData.contactFirstName = '';
+    contactData.contactMiddleName = '';
+    contactData.contactLastName = '';
+    contactData.contactEmail = '';
+    contactData.contactPhoneNumber = '';
+    contact = new Contact(contactData);
+    await contact.save(contactData);
+  }
+
+  // check if chat already exist between the contact and the saId exist create chat for sa and contact
+  let chat = await Chat.findOne({where:{saId: saId, contactId: contact.id}});
+  if (!chat) {
+    const chatData  = {}
+    chatData.saId = serviceaccess.id;
+    chatData.contactId = contact.id;
+    chatData.chatStatus = 'Open';
+    chat = new Chat(chatData);
+    await chat.save(chatData);
+  }
+
+  // process the message first if image or other, except Text
+  
+
+  // add message to messages using chat.id
+  const messageData  = {}
+  messageData.chatId = chat.id;
+  messageData.senderId = contact.id;
+  messageData.message = message;
+  messageData.messageType = 'Text';
+  message = new Message(messageData);
+  await message.save(messageData);
+
+  // process your response using all means necessary
+  
+
+  // add the response to messages using chat.id
+  
+
+  // know where the data is coming from;
   const input2 = req.body.entry?.[0]?.changes[0]?.value?.messages;
   
   if (!input) return res.sendStatus(200);
@@ -166,12 +234,11 @@ async function incomingMessage(req, res, data) {
   } else if (input == "/courselist") {
     feedback = "> Zion Reborn University Course List:* \n* B.Sc. Statistics. \n* B.Sc. Mathematics. \n* B.Sc. Economics. \n* B.Sc. Transport. \n* B.A. Theatre Arts. \n* B.Sc. Computer Science.";
   } else {
-    const data = {}
-    data.input = input
+    const data = {};
+    data.input = input;
     feedback = await generateResponse(data);
   }
 
-  // check if the webhook request contains a message
   // details on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
   const message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
 

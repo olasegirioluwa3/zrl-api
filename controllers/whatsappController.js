@@ -38,14 +38,20 @@ async function sendWhatsappVerifyToken(req, res, data) {
     data.userId = user.id;
     const newWhatsapp = new Whatsapp(data);
     if (await newWhatsapp.save(data)){
-      console.log(newWhatsapp.id);
       const sa_data = {};
       sa_data.svId = newWhatsapp.svId;
       sa_data.svProductId = newWhatsapp.id;
+      sa_data.status = "Init";
+      
+      const newServiceAccess = new ServiceAccess(sa_data);
+      if (! await newServiceAccess.save(sa_data)){
+        return res.status(401).json({ message: 'ServiceAccess create failed, please, try again' });
+      }
+
+      sa_data.saId = newServiceAccess.id;
       sa_data.userId = newWhatsapp.userId;
       sa_data.role = "Admin";
       sa_data.status = "Active";
-      
       const newUserAccess = new UserAccess(sa_data);
       // const sendingStatus = true; //await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");
       const sendingStatus = await sendSMS(whatsappNumber, "activation token: "+theEncryptedNumber, "ZRL");

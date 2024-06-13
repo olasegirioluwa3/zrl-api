@@ -1,5 +1,5 @@
 async function validateUserAccessData(input = {}) {
-  const { id, email, svId, svProductId, userId, role, inviteBy } = input;
+  const { id, email, saId, userId, role, inviteBy } = input;
   const errors = [];
   const data = {};
   const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
@@ -13,7 +13,6 @@ async function validateUserAccessData(input = {}) {
       data.id = parseInt(id, 10);
     }
   }
-  
 
   if (email){
     if (!email || !email.trim()) {
@@ -25,23 +24,13 @@ async function validateUserAccessData(input = {}) {
     }
   }
 
-  if (svId) {
-    if (!svId.trim()) {
-      errors.push('svId is required');
-    } else if (svId.length > 10) {
-      errors.push('svId should contain at least 10 characters');
+  if (saId) {
+    if (!saId.trim()) {
+      errors.push('saId is required');
+    } else if (saId.length > 10) {
+      errors.push('saId should contain at least 10 characters');
     } else {
-      data.svId = svId;
-    }
-  }
-
-  if (svProductId) {
-    if (!svProductId.trim()) {
-      errors.push('svProductId is required');
-    } else if (svProductId.length > 10) {
-      errors.push('svProductId should contain at least 10 characters');
-    } else {
-      data.svProductId = svProductId;
+      data.saId = saId;
     }
   }
 

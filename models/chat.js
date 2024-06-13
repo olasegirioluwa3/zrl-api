@@ -26,7 +26,7 @@ const initializeChatModel = (sequelize) => {
     chatStatus: {
       type: DataTypes.ENUM('Open', 'Close', 'Suspended'),
       defaultValue: 'Open'
-    }, 
+    },
     joinDate: {
       type: DataTypes.DATE,
       defaultValue: new Date()

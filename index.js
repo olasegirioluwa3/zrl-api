@@ -21,7 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("/public"));
-app.use('/uploads', express.static("public/uploads"));   
+app.use('/uploads', express.static("public/uploads"));
 // app.use('/profileimgs', express.static("public/profileimgs"));
 
 // Import and use the userRoutes function passing app and io

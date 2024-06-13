@@ -50,7 +50,7 @@ async function create(req, res, data) {
 
       let paymentGateway = PaymentGateway;
       let finalAmount;
-
+      
       if (paymentData.gateway === 'Paystack') {
         paymentGateway = new PaystackGateway();         
         const decimalFee = 1.95 / 100.0;

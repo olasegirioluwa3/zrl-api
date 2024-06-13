@@ -35,7 +35,7 @@ async function getOne(req, res, data) {
   }
 }
 
-async function createServiceAccess(req, res, data) {
+async function activateServiceAccess(req, res, data) {
   try {
     const userId = req.user.id;
     const user = await User.findByPk(userId);
@@ -44,15 +44,23 @@ async function createServiceAccess(req, res, data) {
     }
 
     // get data from service
-    const service = await ServiceType.findByPk(data.svId);
+    const serviceaccess = await ServiceAccess.findByPk(data.saId);
+    if (!serviceaccess) {
+      return res.status(400).send({ status: "failed", error: 'Unknown service access' });
+    }
+
+    if (serviceaccess.status !== "Init") {
+      return res.status(400).send({ status: "failed", error: 'service access do not need to be reactivated' });
+    }
+
+    // get data from service
+    const service = await ServiceType.findByPk(serviceaccess.svId);
     if (!service) {
       return res.status(400).send({ status: "failed", error: 'Unknown service' });
     }
 
     // switch to check if user have access to svProductId
-    const newServiceAccess = new ServiceAccess(data);
     const paymentData = {};
-    const serviceaccess = await newServiceAccess.save(data);
     if (serviceaccess) {
       // initiate payment
       paymentData.userId = req.user.id;
@@ -120,5 +128,5 @@ async function createServiceAccess(req, res, data) {
 module.exports = {
   getAll,
   getOne,
-  createServiceAccess
+  activateServiceAccess
 };

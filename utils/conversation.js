@@ -16,7 +16,7 @@ const generateResponse = async ( data ) => {
         ],
       model: 'gpt-3.5-turbo',
     });
-    // console.log(chatCompletion.choices[0].message.content);
+    // console.log(chatCompletion.choices[0].message.content);k
     return chatCompletion.choices[0].message.content;
   } catch (error) {
     // console.error("Error generating response:", error);

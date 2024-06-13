@@ -40,8 +40,8 @@ const initializeServiceAccessModel = (sequelize) => {
       defaultValue: 0
     },
     status: {
-      type: DataTypes.ENUM('Pending', 'Active', 'Failed'),
-      defaultValue: 'Pending'
+      type: DataTypes.ENUM('Init','Pending', 'Active', 'Failed'),
+      defaultValue: 'Init'
     },
     paymentDate: {
       type: DataTypes.DATE,

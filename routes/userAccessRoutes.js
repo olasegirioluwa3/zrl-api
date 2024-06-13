@@ -11,7 +11,6 @@ module.exports = (app, io, sequelize) => {
   // Registration (handled by userController)
   router.post('/invite', authenticateToken, async (req, res) => {
     try {
-      // check if the request is from a verified user
       const { data, errors } = await validateUserAccessData( req.body );
       if (errors.length > 0) {
         return res.status(400).json({ errors });

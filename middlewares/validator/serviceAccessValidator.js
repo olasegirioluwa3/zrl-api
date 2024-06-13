@@ -1,8 +1,18 @@
 async function validateServiceAccessData(input = {}) {
-  const { svId, svProductId, amountPaid, paymentReference, paymentAuthorizer, gateway, currency, quantity } = input;
+  const { saId, svId, svProductId, amountPaid, paymentReference, paymentAuthorizer, gateway, currency, quantity } = input;
   const errors = [];
   const data = {};
   const sentencePattern = /^[a-zA-Z\s.,!?;:'"-]+$/; // Pattern for sentences with common punctuation
+
+  if (saId) {
+    if (!saId.trim()) {
+      errors.push('saId is required');
+    } else if (saId.length > 10) {
+      errors.push('saId should contain at least 10 characters');
+    } else {
+      data.saId = saId;
+    }
+  }
 
   if (svId) {
     if (!svId.trim()) {
